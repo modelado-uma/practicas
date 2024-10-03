@@ -1,10 +1,11 @@
-
 class Piloto
 attributes
 kilometros : Integer
 edad : Integer
 
-class Principal
+class Principal -- role of piloto
+
+class Secundario -- role of piloto
 
 class Avion
 attributes
@@ -24,47 +25,57 @@ class Desguace
 capacidadMaxima : Integer
 capacidadEnUso : Integer
 
-class Hanger
+class Hangar
 capacidadMaxima : Integer
 capacidadEnUso : Integer
 
-----------Fin de Clases de Asociación----------
+----------Asociaciones----------
+association pilotoVuelaAvion between
+  Piloto[0..1] role piloto
+  Avion[0..1] role avion 
+end
 
+
+
+----------Inicio de Clases de Asociación----------
+associationclass 
+
+
+
+----------Fin de Clases de Asociación----------
 ----------Invariantes (Restricciones de Integridad)--------
 
 constraints
 
 context Avion
+
 -- Para estar en el desguace, el avión tiene que haber completado 1000 vuelos
 
 inv avionEnDesguace:
     self.vuelosCompletados >= 1000
 
--- Los hangares y desguaces tienen una capacidad máxima (no se especifica)
+context Hangar
+
+-- Los hangares tienen una capacidad máxima
 
 inv comprobarHangaresMaxima:
     self.capacidadEnUso <= self.capacidadMaxima
 
+context Desguace
+
+-- Los desguaces tienen una capacidad máxima 
+
 inv comprobarDesguacesMaxima:
     self.capacidadEnUso <= self.capacidadMaxima
 
--- Solo puede haber un desguace, como máximo, en un aeropuerto 
-
-inv 1DesguaceEn1Aeropuerto:
-    
-
--- No puede haber más de un aeropuerto en cada ciudad
-
-inv 1AeropuertoEn1Ciudad
+context Piloto
 
 -- Los pilotos principal y secundario deben ser personas distintas
 
 inv pilotoPrincipalDiferenteDeSecundario
+    --TODO
 
 -- Los pilotos pro son aquellos que han participado como piloto secundario en un mínimo de 2000 vuelos y además deben haber participado como piloto principal en un mínimo de 1000 vuelos.
 
 inv pilotoPro
-
---No se permite a un piloto trabajar o haber trabajado para más de dos aerolíneas diferentes.
-
-inv pilotoNoMasDeDosAerolineas
+    --TODO
