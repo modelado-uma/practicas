@@ -1,18 +1,27 @@
-class Piloto
+model aviones
+
+class Persona
 attributes
-kilometros : Integer
-edad : Integer
+nombre: String
+edad: Integer
+
+class Pasajero -- role of persona
+
+class Piloto -- role of persona
+attributes
+kmVolados : Integer
+pro: Boolean
 
 class Principal -- role of piloto
-
 class Secundario -- role of piloto
+
 
 class Avion
 attributes
 vuelosCompletados : Integer
 kilometrosRecorridos : Integer
 
-class aeropuerto
+class Aeropuerto
 attributes 
 nombre: String
 
@@ -21,24 +30,88 @@ attributes
 nombre: String
 id: Integer
 
-class Desguace
-capacidadMaxima : Integer
-capacidadEnUso : Integer
+class Almacen
+attributes
+capacidad: Integer
 
-class Hangar
-capacidadMaxima : Integer
-capacidadEnUso : Integer
+class Desguace < Almacen
+class Hangar < Almacen
 
-----------Asociaciones----------
-association pilotoVuelaAvion between
-  Piloto[0..1] role piloto
-  Avion[0..1] role avion 
+class Ciudad
+nombre: String
+
+----------Asociaciones---------- 7/16
+association PilotoVuelo between
+  Piloto[0..2] role piloto
+  Vuelo[0..1] role avion 
 end
 
+association AlmacenAvion between
+    Avion [0..*] role pertenece
+    Almacen [0..1] role tiene 
+end 
 
+association VueloAvion between
+    Avion[0..1] role realiza
+    Vuelo[0..*] role esRealizado
+end
+
+association PilotoAerolinea between
+    Piloto [1..*] role trabaja
+    Aerolinea [1..2] role tiene
+end
+
+association CiudadAeropuerto between
+    Ciudad[1] role tiene
+    Aeropuerto[0..1] role ubicado
+end
+
+association DesguaceAeropuerto between
+    Desguace[0..1] role estaEn
+    Aeropuerto[1] role tiene
+end
+
+association HangarAeropuerto between
+    Hangar[0..*] role estaEn
+    Aeropuerto[1] role tiene
+end
+
+association vueloPasajero between
+    Vuelo[0..*] role lleva
+    Pasajero[0..*] role viajan
+
+end
+
+association RolePrincipal between
+    Piloto[1]
+    Principal[1]
+end
+
+association RoleSecundario between
+    Piloto[1]
+    Secundario[1]
+end
+
+association RolePiloto between
+    Persona[1]
+    Piloto[1]
+end
+
+association RolePasajero between 
+    Persona[1]
+    Pasajero[1]
+     
 
 ----------Inicio de Clases de Asociación----------
-associationclass 
+associationclass Contrato 
+between
+    Avion [1..*] role tiene
+    Aerolinea [1..*] role tienen
+    attributes
+    num_Meses : Integer
+    precio_Mes : Integer
+    precio_Total : Integer
+end
 
 
 
@@ -57,16 +130,14 @@ inv avionEnDesguace:
 context Hangar
 
 -- Los hangares tienen una capacidad máxima
-
 inv comprobarHangaresMaxima:
-    self.capacidadEnUso <= self.capacidadMaxima
+    --self.capacidadEnUso <= self.capacidadMaxima
 
 context Desguace
 
 -- Los desguaces tienen una capacidad máxima 
-
 inv comprobarDesguacesMaxima:
-    self.capacidadEnUso <= self.capacidadMaxima
+    --self.capacidadEnUso <= self.capacidadMaxima
 
 context Piloto
 
@@ -79,3 +150,5 @@ inv pilotoPrincipalDiferenteDeSecundario
 
 inv pilotoPro
     --TODO
+
+
