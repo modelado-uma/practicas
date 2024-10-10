@@ -4,41 +4,59 @@ class Persona
 attributes
 nombre: String
 edad: Integer
+end
 
 class Pasajero -- role of persona
+end
 
 class Piloto -- role of persona
 attributes
 kmVolados : Integer
 pro: Boolean
+end
 
 class Principal -- role of piloto
+end
 class Secundario -- role of piloto
-
+end
 
 class Avion
 attributes
 vuelosCompletados : Integer
 kilometrosRecorridos : Integer
+end
 
 class Aeropuerto
 attributes 
 nombre: String
+end
 
 class Aerolinea
 attributes
 nombre: String
 id: Integer
+end
 
 class Almacen
 attributes
 capacidad: Integer
+end
 
 class Desguace < Almacen
+end
 class Hangar < Almacen
+end
 
 class Ciudad
+attributes
 nombre: String
+end
+
+class Vuelo
+attributes
+id: Integer
+num_km: Integer
+end
 
 ----------Asociaciones---------- 7/16
 association PilotoVuelo between
@@ -100,8 +118,7 @@ end
 association RolePasajero between 
     Persona[1]
     Pasajero[1]
-     
-
+end
 ----------Inicio de Clases de Asociación----------
 associationclass Contrato 
 between
@@ -130,25 +147,30 @@ inv avionEnDesguace:
 context Hangar
 
 -- Los hangares tienen una capacidad máxima
-inv comprobarHangaresMaxima:
-    --self.capacidadEnUso <= self.capacidadMaxima
+--inv comprobarHangaresMaxima:
+    --self.
 
 context Desguace
 
 -- Los desguaces tienen una capacidad máxima 
-inv comprobarDesguacesMaxima:
+--inv comprobarDesguacesMaxima:
     --self.capacidadEnUso <= self.capacidadMaxima
 
-context Piloto
+context PilotoVuelo 
 
 -- Los pilotos principal y secundario deben ser personas distintas
 
-inv pilotoPrincipalDiferenteDeSecundario
-    --TODO
+inv pilotoPrincipalDiferenteDeSecundario:
+    self.piloto->select(oclIsTypeOf(Principal))->size() = 1 and
+    self.piloto->select(oclIsTypeOf(Secundario))->size() <= 1 and
+    self.piloto->select(oclIsTypeOf(Principal)) <> self.piloto->select(oclIsTypeOf(Secundario))
+
+
+context Piloto 
 
 -- Los pilotos pro son aquellos que han participado como piloto secundario en un mínimo de 2000 vuelos y además deben haber participado como piloto principal en un mínimo de 1000 vuelos.
 
-inv pilotoPro
-    --TODO
+--inv pilotoPro
+    --TODO+-
 
 
