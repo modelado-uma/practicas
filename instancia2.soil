@@ -1,0 +1,52 @@
+--COMPROBAR INVARIANTE PILOTO PRO
+
+reset
+-- Valores Iniciales
+!new Avion('avionA')
+!new Avion('avionB')
+!new Avion('avionC')
+!new Avion('avionD')
+
+!avionA.vuelosCompletados := 1001
+!avionA.kilometrosRecorridos := 13456
+
+!avionB.vuelosCompletados := 0
+!avionB.kilometrosRecorridos := 13456
+
+!avionC.vuelosCompletados := 500
+!avionC.kilometrosRecorridos := 13456
+
+!avionD.vuelosCompletados := 1500
+!avionD.kilometrosRecorridos := 13456
+
+!new Piloto('pilotoSalma')
+!new Piloto('pilotoMigue')
+!new Piloto('pilotoMaxi')
+!new Piloto('pilotoMarta')
+
+!pilotoSalma.kmVolados := 100
+!pilotoSalma.pro := false
+
+!pilotoMigue.kmVolados := 2000
+!pilotoMigue.pro := true
+
+!new Vuelo('vueloA')
+!vueloA.id := 001
+!vueloA.num_km := 100
+!new Vuelo('vueloB')
+!vueloA.id := 002
+!vueloA.num_km := 4000
+!new Vuelo('vueloC')
+!vueloA.id := 003
+!vueloA.num_km := 1000
+!new Vuelo('vueloD')
+!vueloA.id := 004
+!vueloA.num_km := 2100
+
+--PilotoVuelo
+
+!insert(pilotoMigue, vueloA) into PilotoVuelo
+!
+
+
+check

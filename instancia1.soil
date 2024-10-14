@@ -1,0 +1,45 @@
+reset
+-- Comprobando la invariante de AvionEnDesguace (vuelosCompletados >= 1000 -> Desguace)
+!new Avion('avion1')
+!avion1.vuelosCompletados := 999
+!avion1.kilometrosRecorridos:= 123454
+
+!new Avion('avion2')
+!avion2.vuelosCompletados := 1000
+!avion2.kilometrosRecorridos := 134563
+
+!new Avion('avion3')
+!avion3.vuelosCompletados := 1202
+!avion3.kilometrosRecorridos := 159382
+
+!new Avion('avion4')
+!avion4.vuelosCompletados := 1103
+!avion4.kilometrosRecorridos := 385920
+
+!new Aerolinea('Air_Europa')
+!Air_Europa.nombre := 'Air Europa'
+
+!new Hangar('Hangar')
+
+!new Desguace('Desguace')
+
+!insert(avion1,Air_Europa) into Contrato
+!insert(avion2, Air_Europa) into Contrato
+!insert(avion3, Air_Europa) into Contrato
+!insert(avion4, Air_Europa) into Contrato
+
+!insert(avion1,Hangar)
+!insert(avion2,Hangar)
+!insert(avion3,Desguace)
+!insert(avion4,Desguace)
+!new Desguace('Desguace')
+
+!insert(avion1,Air_Europa) into Contrato
+!insert(avion2, Air_Europa) into Contrato
+!insert(avion3, Air_Europa) into Contrato
+!insert(avion4, Air_Europa) into Contrato
+
+!insert(avion1,Hangar)
+!insert(avion2,Hangar)
+!insert(avion3,Desguace)
+!insert(avion4,Desguace)
