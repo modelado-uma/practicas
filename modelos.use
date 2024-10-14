@@ -61,12 +61,22 @@ end
 ----------Asociaciones---------- 7/16
 association PilotoVuelo between
   Piloto[0..2] role piloto
-  Vuelo[0..1] role avion 
+  Vuelo[0..1] role avion
+end
+
+association pilotadoPrincipal between
+    Piloto[1] role principal
+    Vuelo[1]
+end
+
+association pilotadoSecundario between
+    Piloto[0..1] role secundario
+    Vuelo[1..*]
 end
 
 association AlmacenAvion between
     Avion [0..*] role pertenece
-    Almacen [0..1] role tiene 
+    Almacen [0..1] role tiene
 end 
 
 association VueloAvion between
@@ -97,7 +107,6 @@ end
 association vueloPasajero between
     Vuelo[0..*] role lleva
     Pasajero[0..*] role viajan
-
 end
 
 association RolePrincipal between
@@ -138,39 +147,35 @@ end
 constraints
 
 context Avion
-
--- Para estar en el desguace, el avión tiene que haber completado 1000 vuelos
-
-inv avionEnDesguace:
-    self.vuelosCompletados >= 1000
+inv AvionEnDesguace:
+-- Los aviones que deben encontrarse en un desguace son aquellos que han completado los 1000 viajes
+    self.vuelosCompletados >= 1000 implies self.tiene.oclIsTypeOf(Desguace)
 
 context Hangar
-
 -- Los hangares tienen una capacidad máxima
---inv comprobarHangaresMaxima:
-    --self.
+inv hangarNoSupereCapacidad:
+    self.tiene.size() <= self.capacidad
 
 context Desguace
-
 -- Los desguaces tienen una capacidad máxima 
---inv comprobarDesguacesMaxima:
-    --self.capacidadEnUso <= self.capacidadMaxima
-
-context PilotoVuelo 
+inv desguaceNoSupereCapacidad:
+    self.tiene.size() <= self.capacidad
 
 -- Los pilotos principal y secundario deben ser personas distintas
-
+context PilotoVuelo 
 inv pilotoPrincipalDiferenteDeSecundario:
     self.piloto->select(oclIsTypeOf(Principal))->size() = 1 and
     self.piloto->select(oclIsTypeOf(Secundario))->size() <= 1 and
     self.piloto->select(oclIsTypeOf(Principal)) <> self.piloto->select(oclIsTypeOf(Secundario))
 
-
 context Piloto 
 
--- Los pilotos pro son aquellos que han participado como piloto secundario en un mínimo de 2000 vuelos y además deben haber participado como piloto principal en un mínimo de 1000 vuelos.
+-- Los pilotos pro son aquellos que han participado como piloto secundario en un mínimo de 2000 vuelos y
+--además deben haber participado como piloto principal en un mínimo de 1000 vuelos.
+-- pv.piloto = self
 
---inv pilotoPro
-    --TODO+-
-
-
+inv pilotoPro:
+    self.pro implies (
+        PilotoVuelo.allInstances()->select(pv | pv.piloto.includes(self) and pv.piloto.oclIsTypeOf(Secundario))->size() >= 2000 and
+        PilotoVuelo.allInstances()->select(pv | pv.piloto.includes(self) and pv.piloto.oclIsTypeOf(Principal))->size() >= 1000
+    )
