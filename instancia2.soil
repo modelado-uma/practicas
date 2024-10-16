@@ -45,8 +45,4 @@ reset
 
 --PilotoVuelo
 
-!insert(pilotoMigue, vueloA) into PilotoVuelo
-!
-
-
-check
+!insert(pilotoMigue, vueloA) into pilotadoPrincipal
