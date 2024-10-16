@@ -139,12 +139,12 @@ context Piloto
 --además deben haber participado como piloto principal en un mínimo de 1000 vuelos.
 inv pilotosProValidos:
     self.pro implies (
-        pilotadoPrincipal.allInstances()->select(pv | pv.principal = self)->size() >= 1 and
-        pilotadoSecundario.allInstances()->select(pv | pv.secundario = self)->size() >= 2
+        pilotadoPrincipal.allInstances()->select(pv | pv.principal = self)->size() >= 1000 and
+        pilotadoSecundario.allInstances()->select(pv | pv.secundario = self)->size() >= 2000
     )
 
 inv pilotoTrabajaEnUnaAerolinea:
-    self.aerolineasDelPiloto->size() = 1
+    self.aerolineasDelPiloto->size() <= 2
 
 context Vuelo
 -- Los pilotos principal y secundario deben ser personas distintas
