@@ -1,10 +1,10 @@
 reset
 !new Piloto('piloto1')
-!new Piloto('piloto1')
-!new Vuelo('piloto1')
-!new Vuelo('piloto1')
-!new Vuelo('piloto1')
-!new Aerolinea('piloto1')
+!new Piloto('piloto2')
+!new Vuelo('vuelo1')
+!new Vuelo('vuelo2')
+!new Vuelo('vuelo3')
+!new Aerolinea('aerolinea1')
 
 !piloto1.nombre := 'Carlos'
 !piloto1.edad := 40

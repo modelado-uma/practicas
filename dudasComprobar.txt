@@ -1,0 +1,4 @@
+-Preguntar como se hace para comprobar la invariante pilotoPro, ya que 8000 lineas de codigo no tiene pinta de que sea la manera
+-Preguntar si las restricciones estan controladas por multiplicidad hay que crear una invariante para saber si se cumple esa multiplicidad, por ejemplo en el de las ciudades con los aeropuertos, puedes meter 2 ciudades por aeropuerto y no se queja, por eso hemos puesto una invariante
+-Preguntar si le mandamos 1 unico diagrama de objetos comprobando TODAS las invariantes o varios q comprueben una o un par de invariantes por diagrama de objetos
+
