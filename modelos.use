@@ -78,7 +78,7 @@ end
 
 association CiudadAeropuerto between
     Ciudad[1] role tieneC
-    Aeropuerto[0..1] role ubicado
+    Aeropuerto[0..1] role aeropuertosEnCiudad
 end
 
 association DesguaceAeropuerto between
@@ -106,6 +106,8 @@ between
     num_Meses : Integer
     precio_Mes : Integer
     precio_Total : Integer
+    derive: 
+        self.num_Meses * self.precio_Mes
 end
 
 ----------Fin de Clases de Asociación----------
@@ -114,7 +116,7 @@ end
 constraints
 
 context Avion
-inv AvionEnDesguace:
+inv avionesEnDesguaceAdecuados:
 -- Los aviones que deben encontrarse en un desguace son aquellos que han completado los 1000 viajes
     self.vuelosCompletados >= 1000 implies self.almacena.oclIsTypeOf(Desguace)
 
@@ -122,19 +124,21 @@ context Almacen
 inv almacenNoSupereCapacidadMaxima:
     self.avionesAlmacenados->size() <= self.capacidad
 
-
 context Piloto 
 -- Los pilotos pro son aquellos que han participado como piloto secundario en un mínimo de 2000 vuelos y
 --además deben haber participado como piloto principal en un mínimo de 1000 vuelos.
-inv pilotoPro:
+inv pilotosProValidos:
     self.pro implies (
         pilotadoPrincipal.allInstances()->select(pv | pv.principal = self)->size() >= 1000 and
         pilotadoSecundario.allInstances()->select(pv | pv.secundario = self)->size() >= 2000
     )
 
-
 context Vuelo
 -- Los pilotos principal y secundario deben ser personas distintas
 inv pilotoPrincipalDistintoSecundario:
     self.principal <> self.secundario 
--- 
+
+context Ciudad
+-- Los aeropuertos se ubican en ciudades, no pudiendo haber más de un aeropuerto en cada ciudad
+inv ciudadesConMaximoUnAeropuerto:
+    self.aeropuertosEnCiudad->size() <= 1
