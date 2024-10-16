@@ -15,11 +15,6 @@ kmVolados : Integer
 pro: Boolean
 end
 
-class Principal -- role of piloto
-end
-class Secundario -- role of piloto
-end
-
 class Avion
 attributes
 vuelosCompletados : Integer
@@ -58,25 +53,20 @@ id: Integer
 num_km: Integer
 end
 
-----------Asociaciones---------- 7/16
-association PilotoVuelo between
-  Piloto[0..2] role piloto
-  Vuelo[0..1] role avion
-end
-
+----------Asociaciones---------- 
 association pilotadoPrincipal between
     Piloto[1] role principal
-    Vuelo[1]
+    Vuelo[1] role pPrincipal
 end
 
 association pilotadoSecundario between
     Piloto[0..1] role secundario
-    Vuelo[1..*]
+    Vuelo[1..*] role pSecundario
 end
 
 association AlmacenAvion between
-    Avion [0..*] role pertenece
-    Almacen [0..1] role tiene
+    Avion [0..*] role avionesAlmacenados
+    Almacen [0..1] role almacena
 end 
 
 association VueloAvion between
@@ -85,23 +75,23 @@ association VueloAvion between
 end
 
 association PilotoAerolinea between
-    Piloto [1..*] role trabaja
-    Aerolinea [1..2] role tiene
+    Piloto [1..*] role trabajaPara
+    Aerolinea [1..2] role tieneComoEmpleado
 end
 
 association CiudadAeropuerto between
-    Ciudad[1] role tiene
+    Ciudad[1] role tieneC
     Aeropuerto[0..1] role ubicado
 end
 
 association DesguaceAeropuerto between
-    Desguace[0..1] role estaEn
-    Aeropuerto[1] role tiene
+    Desguace[0..1] role estaEnD
+    Aeropuerto[1] role contieneD
 end
 
 association HangarAeropuerto between
-    Hangar[0..*] role estaEn
-    Aeropuerto[1] role tiene
+    Hangar[0..*] role estaEnH
+    Aeropuerto[1] role contieneH
 end
 
 association vueloPasajero between
@@ -109,26 +99,8 @@ association vueloPasajero between
     Pasajero[0..*] role viajan
 end
 
-association RolePrincipal between
-    Piloto[1]
-    Principal[1]
-end
-
-association RoleSecundario between
-    Piloto[1]
-    Secundario[1]
-end
-
-association RolePiloto between
-    Persona[1]
-    Piloto[1]
-end
-
-association RolePasajero between 
-    Persona[1]
-    Pasajero[1]
-end
 ----------Inicio de Clases de Asociación----------
+
 associationclass Contrato 
 between
     Avion [1..*] role tiene
@@ -139,8 +111,6 @@ between
     precio_Total : Integer
 end
 
-
-
 ----------Fin de Clases de Asociación----------
 ----------Invariantes (Restricciones de Integridad)--------
 
@@ -149,24 +119,28 @@ constraints
 context Avion
 inv AvionEnDesguace:
 -- Los aviones que deben encontrarse en un desguace son aquellos que han completado los 1000 viajes
-    self.vuelosCompletados >= 1000 implies self.tiene.oclIsTypeOf(Desguace)
+    self.vuelosCompletados >= 1000 implies self.almacena.oclIsTypeOf(Desguace)
 
-context Hangar
--- Los hangares tienen una capacidad máxima
-inv hangarNoSupereCapacidad:
-    self.tiene.size() <= self.capacidad
+-- context Hangar
+-- -- Los hangares tienen una capacidad máxima
+-- inv hangarNoSupereCapacidad:
+--     self.almacena.size() <= self.capacidad
 
-context Desguace
--- Los desguaces tienen una capacidad máxima 
-inv desguaceNoSupereCapacidad:
-    self.tiene.size() <= self.capacidad
+-- context Desguace
+-- -- Los desguaces tienen una capacidad máxima 
+-- inv desguaceNoSupereCapacidad:
+--     self.almacena.size() <= self.capacidad
+
+context Almacen
+inv almacenNoSupereCapacidadMaxima:
+    self.avionesAlmacenados->size() <= self.capacidad
 
 -- Los pilotos principal y secundario deben ser personas distintas
-context PilotoVuelo 
-inv pilotoPrincipalDiferenteDeSecundario:
-    self.piloto->select(oclIsTypeOf(Principal))->size() = 1 and
-    self.piloto->select(oclIsTypeOf(Secundario))->size() <= 1 and
-    self.piloto->select(oclIsTypeOf(Principal)) <> self.piloto->select(oclIsTypeOf(Secundario))
+-- context PilotoVuelo 
+-- inv pilotoPrincipalDiferenteDeSecundario:
+--     self.piloto->select(oclIsTypeOf(Principal))->size() = 1 and
+--     self.piloto->select(oclIsTypeOf(Secundario))->size() <= 1 and
+--     self.piloto->select(oclIsTypeOf(Principal)) <> self.piloto->select(oclIsTypeOf(Secundario))
 
 context Piloto 
 
@@ -176,6 +150,6 @@ context Piloto
 
 inv pilotoPro:
     self.pro implies (
-        PilotoVuelo.allInstances()->select(pv | pv.piloto.includes(self) and pv.piloto.oclIsTypeOf(Secundario))->size() >= 2000 and
-        PilotoVuelo.allInstances()->select(pv | pv.piloto.includes(self) and pv.piloto.oclIsTypeOf(Principal))->size() >= 1000
+        pilotadoPrincipal.allInstances()->select(pv | pv.principal = self)->size() >= 2000 and
+        pilotadoSecundario.allInstances()->select(pv | pv.secundario = self)->size() >= 1000
     )
