@@ -19,16 +19,26 @@ reset
 !avionD.vuelosCompletados := 1500
 !avionD.kilometrosRecorridos := 13456
 
-!new Piloto('pilotoSalma')
-!new Piloto('pilotoMigue')
-!new Piloto('pilotoMaxi')
-!new Piloto('pilotoMarta')
+--Creamos 4 pilotos y le asignamos kmVolados y comprobamos los 4 casos de piloto
+
+!new Piloto('pilotoSalma') --pro = false y la variable pro deberia ser false (Ejemplo de pro=false correcto)
+!new Piloto('pilotoMigue') --pro = true y la variable pro deberia ser true (Ejemplo de pro=true correcto)
+!new Piloto('pilotoMaxi')  --pro = false y la variable pro deberia ser true porque si que lo es (Ejemplo de pro=false incorrecto)
+!new Piloto('pilotoMarta') --pro = true y la variable pro deberia ser false porque no lo es (Ejemplo de pro true incorrecto)
 
 !pilotoSalma.kmVolados := 100
 !pilotoSalma.pro := false
 
 !pilotoMigue.kmVolados := 2000
 !pilotoMigue.pro := true
+
+!pilotoMaxi.kmVolados := 2000
+!pilotoMaxi.pro := false
+
+!pilotoMarta.kmVolados := 2000
+!pilotoMarta.pro := true
+
+--Creamos 4 pilotos para asignarle un vuelo a cada uno
 
 !new Vuelo('vueloA')
 !vueloA.id := 001
@@ -46,3 +56,4 @@ reset
 --PilotoVuelo
 
 !insert(pilotoMigue, vueloA) into pilotadoPrincipal
+check
