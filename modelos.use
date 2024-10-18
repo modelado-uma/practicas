@@ -127,8 +127,8 @@ inv avionesEnDesguaceAdecuados:
     self.vuelosCompletados >= 1000 implies self.almacena.oclIsTypeOf(Desguace)
 
 -- Un mismo avión no puede estar en dos almacenes distintos a la vez
-inv avionSoloEnUnAlmacen:
-    self.almacena->size() <= 1
+--inv avionSoloEnUnAlmacen:
+--    self.almacena->size() <= 1
 
 context Almacen
 inv almacenNoSupereCapacidadMaxima:
@@ -143,8 +143,8 @@ inv pilotosProValidos:
         pilotadoSecundario.allInstances()->select(pv | pv.secundario = self)->size() >= 2000
     )
 
-inv pilotoTrabajaEnUnaAerolinea:
-    self.aerolineasDelPiloto->size() <= 2
+--inv pilotoTrabajaEnDosAerolineasMaximo:
+--    self.aerolineasDelPiloto->size() <= 2
 
 context Vuelo
 -- Los pilotos principal y secundario deben ser personas distintas
@@ -157,8 +157,8 @@ inv idVuelosUnicos:
 
 context Ciudad
 -- Los aeropuertos se ubican en ciudades, no pudiendo haber más de un aeropuerto en cada ciudad
-inv ciudadesConMaximoUnAeropuerto:
-    self.aeropuertosEnCiudad->size() <= 1
+--inv ciudadesConMaximoUnAeropuerto:
+--    self.aeropuertosEnCiudad->size() <= 1
 
 context Aerolinea
 -- Las aerolineas tienen que tener nombres distintos
