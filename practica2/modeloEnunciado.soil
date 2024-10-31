@@ -1,0 +1,6 @@
+reset 
+
+!new Ciudad('Málaga')
+!new Ciudad('Sevilla')
+!new Ciudad('Granada')
+

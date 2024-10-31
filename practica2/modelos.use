@@ -38,7 +38,7 @@ enum TipoRevision {
 
 class Coche
 attributes
-mantenimiento: Boolean
+garantia: Boolean
 fechaMatriculacion: Integer
 estado: EstadoCoche
 numKm: Integer
@@ -54,19 +54,17 @@ attributes
 fechaInicio: Integer
 fechaFin: Integer
 distancia: Integer
-derive:
-    self.viajaA->
 end
 
 abstract class Taller
 end
 
-class Oficial < Taller
+class TallerOficial < Taller
 attributes
-garantía: Integer
+garantia: Integer
 end
 
-class NoOficial < Taller
+class TallerNoOficial < Taller
 end
 
 class Revision
@@ -106,11 +104,11 @@ end
 
 association tallerRevision between
     Taller[1] role tallerQueRevisa
-    Revisión[*] role RevisionRealizadaPorTaller
+    Revision[*] role RevisionRealizadaPorTaller
 end
 
 association ciudadDestinoViaje between
-    Ciudad[1] role ciudadDestinoDelViaje
+    Ciudad[1] role 
     Viaje[*] role viajaA
 end
 
@@ -122,3 +120,45 @@ end
 --Invariantes
 
 constraints
+
+context Viaje 
+--cada ciudad debe estar al menos a 5 kilómetros de distancia de otra. 
+inv distanciaMinimaEntreCiudades:
+    self.distancia >= 5
+--la ciudad de origen y destino de un viaje deben ser distintas
+inv ciudadOrigenYDestinoDistintas:
+    self.ciudadOrigenDelViaje <> self.ciudadDestinoDelViaje
+
+
+context Coche
+inv revisionesDeCocheNoSePisan:
+    self.revisionDelCoche -> forAll (r1 | self.revisionDelCoche -> forAll (r2 | r1 <> r2 && r1.fechaFin < r2.fechaInicio || r1.fechaInicio > r2.fechaFin))
+  
+  
+ context cocheEnRevision
+--fecha de revision del coche tiene que ser posterior a fecha de revision
+inv fechaRevisionPOSTFechaMatriculacion:
+    self.revisionDelCoche.fechaInicio > self.cocheHaciendoRevision.fechaMatriculacion
+
+--Si un coche está siendo sometido a revisión en un taller, el coche se debe encontrar
+-- en la ciudad de ese mismo taller
+inv cocheEstaMismaCiudadTallerCuandoEnRevision:
+    if self.estado = EstadoCoche-#ENTALLER implies(
+        if self.revisionDelCoche.tallerQueRevisa.oclIsTypeOf(TallerOficial) then
+            self.ciudadCocheEstacionado = self.revisionDelCoche.tallerQueRevisa.ciudadConTallerOficial
+        else
+            self.ciudadCocheEstacionado = self.revisionDelCoche.tallerQueRevisa.ciudadConTallerNoOficial
+        endif
+    )
+
+
+inv self.estado = EstadoCoche-#ENVIAJE implies self.viajeQueHaceCoche -> exists(viaje | viaje.fechaFin = null)
+
+inv cuidadDeDestinoAnteriorCuidadDeOrigenSiguiente:
+  self.viajeQueHaceCoche -> forAll( v | self.viajeQueHaceCoche -> select(v2 | v2.fechaFin < v.fechaInicio) -> sortedBy(fechaFin) -> last().ciudadDestino = v.ciudadOrigen)) 
+
+--   lista = (x1,x2,x3,x4) ==> for i in range(lista)
+--   i.ciudaddestino == i+1.ciudadOrigen
+--   x3 -> (x1,x2) -> sort -> last() -> x2
+
+ 
