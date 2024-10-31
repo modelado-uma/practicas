@@ -1,0 +1,124 @@
+model Practica2
+
+enum EstadoCoche {
+    ESTACIONADO
+    ENVIAJE
+    ENTALLER
+}
+
+enum TipoRevision {
+    MANTENIMIENTO
+    REPARACION
+}
+
+
+-- class Clock 
+--     attributes
+--         NOW : Integer init = 0 -- POSIX representation starting at 0
+--         resolution: Integer init = 1 
+--     operations
+--         tick() 
+--             begin
+--                 self.NOW := self.NOW + self.resolution;
+--                 for o in self.ao do 
+--                     o.tick()
+--             end;
+--         end
+--         post TimePasses: self.NOW = self.NOW@pre + self.resolution
+--     run (n: Integer)
+--         begin
+--             for i in Sequence{1..n} do
+--                 self.tick()
+--             end 
+--         end
+--   constraints
+--     inv PositiveResolution: self.resolution > 0
+
+
+
+class Coche
+attributes
+mantenimiento: Boolean
+fechaMatriculacion: Integer
+estado: EstadoCoche
+numKm: Integer
+derive:
+    self.viajeQueHaceCoche->collect(viaje | viaje.distancia)->sum()
+end
+
+class Ciudad
+end
+
+class Viaje
+attributes
+fechaInicio: Integer
+fechaFin: Integer
+distancia: Integer
+derive:
+    self.viajaA->
+end
+
+abstract class Taller
+end
+
+class Oficial < Taller
+attributes
+garantía: Integer
+end
+
+class NoOficial < Taller
+end
+
+class Revision
+attributes
+fechaInicio: Integer
+fechaFin: Integer
+tipoRevision: 
+end
+
+
+----------Asociaciones---------- 
+
+association estacionadoEn between
+    Ciudad[0..1] role ciudadCocheEstacionado
+    Coche[*] role esta cocheEstacionadoEnCiudad
+end
+
+association cocheHaceViaje between
+    Coche[1] role cocheEnElViaje
+    Viaje[*] role viajeQueHaceCoche
+end
+
+association contieneTallerNoOficial between
+    Ciudad[*] role ciudadconTallerNoOficial
+    NoOficial[*] role tallerNoOficialEstaEnCiudad
+end
+
+association tallerOficialCiudad between
+    Ciudad[*] role ciudadConTallerOficial
+    Oficial[1] role tallerOficialEstaEnCiudad
+end
+
+association cocheEnRevision between
+    Coche[1] role cocheHaciendoRevision
+    Revision[*] role revisionDelCoche
+end
+
+association tallerRevision between
+    Taller[1] role tallerQueRevisa
+    Revisión[*] role RevisionRealizadaPorTaller
+end
+
+association ciudadDestinoViaje between
+    Ciudad[1] role ciudadDestinoDelViaje
+    Viaje[*] role viajaA
+end
+
+association ciudadOrigenViaje between
+    Ciudad[1] role ciudadOrigenDelViaje
+    Viaje[*] role viajaDesde
+end
+
+--Invariantes
+
+constraints
