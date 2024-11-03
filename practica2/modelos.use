@@ -155,3 +155,15 @@ inv estadoViajeImplicaViaje:
 
 inv cuidadDeDestinoAnteriorCuidadDeOrigenSiguiente:
   self.viajeQueHaceCoche -> forAll( v | self.viajeQueHaceCoche -> select(v2 | v2.fechaFin < v.fechaInicio) -> sortedBy(fechaFin) -> last().ciudadDestinoDelViaje = v.ciudadOrigenDelViaje)
+
+inv cocheViajandoOEnCiudad:
+    (self.estado = EstadoCoche :: ENVIAJE) || (self.estado = EstadoCoche :: ESTACIONADO) || (self.estado = EstadoCoche :: ENTALLER)
+
+inv cocheEstaEnCiudadLlegadaUltimoViaje:
+    (self.viajeQueHaceCoche -> exists(viaje | viaje.fechaFin <> null)) implies let ultimoViaje = self.viajeQueHaceCoche -> select(v | v.fechaFin <> null) -> sortedBy(fechaFin) -> last() in ultimoViaje.ciudadDestinoDelViaje = self.ciudadCocheEstacionado
+
+
+
+
+
+
