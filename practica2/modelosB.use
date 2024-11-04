@@ -118,7 +118,7 @@ kmD: Integer
             post FechaInicioEstablecida: (v.fechaInicio = Clock.allInstances()->asSequence()->any(true).NOW) 
             post ViajeAsignadoAlCoche: (self.viajeQueHaceCoche->includes(v))
 
-        tick() --Cada tick ejecuta un avanzarViaje
+        avanzarViaje() --Cada tick ejecuta un avanzarViaje
             begin
                 declare v : Viaje, dia : Integer;
                 dia:=Clock.allInstances()->asSequence()->any(true).NOW;
@@ -133,8 +133,15 @@ kmD: Integer
             end
             pre YaComenzado: (self.estado = #ENVIAJE) 
             post CondicionAvanzadoSiDestinoAlcanzo: let v : Viaje = self.viajeQueHaceCoche->select(v | not v.destinoAlcanzado)->any(true) in (v.kmRecorridos = v.distancia) implies (self.estado = #ESTACIONADO)
-            post FechaFinDefinidaSiDestinoAlcanzado: let v : Viaje = self.viajeQueHaceCoche->select(v | not v.destinoAlcanzado)->any(true) in (v.kmRecorridos = v.distancia) implies (v.fechaFin = Clock.allInstances()->asSequence()->any(true).NOW)
+            post FechaFinDefinidaSiDestinoAlcanzado: let v : Viaje = self.viajeQueHaceCoche->select(v | not v.destinoAlcanzado@pre)->any(true) in (v.kmRecorridos = v.distancia) implies (v.fechaFin = Clock.allInstances()->asSequence()->any(true).NOW)
             post KilometrajeActualizadoSiNoDestino: let v : Viaje = self.viajeQueHaceCoche->select(v | not v.destinoAlcanzado)->any(true) in  (v.kmRecorridos < v.distancia) implies (v.kmRecorridos = v.kmRecorridos@pre + self.kmD)
+        tick()
+        begin
+        if not self.viajeQueHaceCoche->select(v | not v.destinoAlcanzado)->any(true).destinoAlcanzado then
+            self.avanzarViaje()
+        end
+        end
+
 
 end
 
