@@ -1,0 +1,181 @@
+-- (b)Este apartado consiste en modelar el comportamiento del sistema. En particular, se va a
+-- modelar únicamente el comportamiento de los coches cuando viajan. Para ello, vamos a
+-- registrar la velocidad de los coches. La velocidad de un coche indica cuántos kilómetros
+-- avanza cada día en los viajes. El sistema también va a almacenar los kilómetros de los
+-- viajes. Cuando un viaje está en curso, este atributo indica los kilómetros que lleva
+-- realizado. Cuando un viaje se completa, este atributo debe tener el mismo valor que los
+-- kilómetros del recorrido que ha realizado. Se deben modelar las siguientes acciones:
+
+--  (b1) Un coche comienza un viaje desde la ciudad en la que se encuentra. Esta operación debe
+-- recibir como parámetro el recorrido entre dos ciudades que debe realizar en su viaje.
+
+-- (b2) Una operación avanzar que se ejecuta sobre los coches, y que no recibe ningún
+-- parámetro. Esta operación debe hacer avanzar el coche el número de kilómetros
+-- indicados en su velocidad si el coche está realizando algún viaje.
+
+--  (b3) Se debe modelar el paso del tiempo, de modo que un tic del reloj representa el paso de
+-- un día, lo cual se debe tener en cuenta a la hora de que los coches puedan avanzar en el
+-- viaje que estén realizando.
+
+model practica2B
+
+enum EstadoCoche {
+    ESTACIONADO,
+    ENVIAJE,
+    ENTALLER
+}
+
+enum TipoRevision {
+    MANTENIMIENTO,
+    REPARACION
+}
+
+class Clock 
+
+    attributes
+        NOW : Integer init = 0 -- POSIX representation starting at 0
+        resolution: Integer init = 1 
+    operations
+        tick() 
+            begin
+                self.NOW := self.NOW + self.resolution;
+                for o in self.ao do 
+                    o.tick()
+            end;
+        end
+        post TimePasses: self.NOW = self.NOW@pre + self.resolution
+    run (n: Integer)
+        begin
+            for i in Sequence{1..n} do
+                self.tick()
+            end 
+        end
+  constraints
+    inv PositiveResolution: self.resolution > 0
+  end
+
+  abstract class ActiveObject -- real-time objects 
+    operations
+        tick() begin end 
+end
+
+association Time between 
+    Clock [1] 
+    ActiveObject [*] role ao ordered
+end
+
+class Coche < ActiveObject
+attributes
+garantia: Boolean
+fechaMatriculacion: Integer
+estado: EstadoCoche
+numKm: Integer
+derive:
+    self.viajeQueHaceCoche->collect(viaje | viaje.distancia)->sum()
+kmD: Integer
+    operations
+        comenzarViaje(v : Viaje) 
+        
+            begin
+                insert(self, v) into cocheHaceViaje;
+                self.estado:=EstadoCoche::ENVIAJE;
+                v.fechaInicio:= 1;
+            end
+            pre CondicionCoche : (self.estado=EstadoCoche::ESTACIONADO) and (v.kmRecorridos=0) 
+            
+
+        avanzarViaje(v : Viaje) --Cada tick ejecuta un avanzarViaje
+            -- begin
+            --     let (v : Viaje = self.viajeQueHaceCoche->select(v | not v.destinoAlcanzado)->any()) in
+            --         if (v.kmRecorridos + self.kmD >= v.distancia) then
+            --             (v.kmRecorridos:=v.distancia) and (self.estado:=EstadoCoche::ESTACIONADO) and v.fechaFin:=5;
+            --         else
+            --             v.kmRecorridos := v.kmRecorridos + self.kmD;
+            --             end;
+            --         end;
+            --     end
+            -- end
+            -- pre viajeYaComenzado: (self.estado = EstadoCoche::ENVIAJE)
+--ARREGLAR
+end
+        
+        
+    
+
+
+class Ciudad
+end
+
+class Viaje
+attributes
+fechaInicio: Integer
+fechaFin: Integer
+distancia: Integer
+kmRecorridos: Integer
+destinoAlcanzado: Boolean
+derive:
+    self.distancia = self.kmRecorridos
+    
+end
+
+abstract class Taller
+end
+
+class TallerOficial < Taller
+attributes
+garantia: Integer
+end
+
+class TallerNoOficial < Taller
+end
+
+class Revision
+attributes
+fechaInicio: Integer
+fechaFin: Integer
+tipoRevision: TipoRevision
+end
+
+
+----------Asociaciones---------- 
+
+association estacionadoEn between
+    Ciudad[0..1] role ciudadCocheEstacionado
+    Coche[*] role cocheEstacionadoEnCiudad
+end
+
+association cocheHaceViaje between
+    Coche[1] role cocheEnElViaje
+    Viaje[*] role viajeQueHaceCoche
+end
+
+association contieneTallerNoOficial between
+    Ciudad[*] role ciudadconTallerNoOficial
+    TallerNoOficial[*] role tallerNoOficialEstaEnCiudad
+end
+
+association tallerOficialCiudad between
+    Ciudad[*] role ciudadConTallerOficial
+    TallerOficial[1] role tallerOficialEstaEnCiudad
+end
+
+association cocheEnRevision between
+    Coche[1] role cocheHaciendoRevision
+    Revision[*] role revisionDelCoche
+end
+
+association tallerRevision between
+    Taller[1] role tallerQueRevisa
+    Revision[*] role RevisionRealizadaPorTaller
+end
+
+association ciudadDestinoViaje between
+    Ciudad[1] role llegaA
+    Viaje[*] role viajaA
+end
+
+association ciudadOrigenViaje between
+    Ciudad[1] role ciudadOrigenDelViaje
+    Viaje[*] role viajaDesde
+end
+

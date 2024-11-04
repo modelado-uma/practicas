@@ -1,0 +1,54 @@
+reset 
+
+!new Clock('reloj')
+
+!new Coche('Citroen')
+!new Coche('Oppel')
+!new Coche('Ferrari')
+
+!new Ciudad('Barcelona')
+!new Ciudad('Madrid')
+!new Ciudad('Malaga')
+
+--Restricciones: 
+--Distancia entre ciudades
+!new Viaje('viajeA')
+!viajeA.fechaInicio:=2
+!viajeA.fechaFin:=5
+!viajeA.distancia:=4
+--Mal
+
+!new Viaje('viajeB')
+!viajeB.fechaInicio:=3
+!viajeB.fechaFin:=13
+!viajeB.distancia:=21
+--Bien
+
+--Relacion entre ciudades
+!insert(Citroen, viajeA) into cocheHaceViaje
+!insert(Barcelona, viajeA) into ciudadOrigenViaje
+!insert(Madrid, viajeA) into ciudadDestinoViaje
+
+--Fecha revision y matriculacion
+!Ferrari.fechaMatriculacion:=20
+!Oppel.fechaMatriculacion:=37
+!new Revision('revision1')
+!revision1.fechaInicio:=30
+!new Revision('revision2')
+!revision2.fechaInicio:=35
+
+!insert(Ferrari, revision1) into cocheEnRevision
+--Bien
+!insert(Oppel, revision2) into cocheEnRevision
+--Mal
+
+--Revisiones coche
+!new Revision('revision3')
+!new Revision('revision4')
+
+!insert(Citroen, revision3)
+!insert(Citroen, revision4)
+--Mal
+
+--Talleres en ciudad
+!new Taller

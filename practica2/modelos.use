@@ -1,13 +1,13 @@
 model Practica2
 
 enum EstadoCoche {
-    ESTACIONADO
-    ENVIAJE
+    ESTACIONADO,
+    ENVIAJE,
     ENTALLER
 }
 
 enum TipoRevision {
-    MANTENIMIENTO
+    MANTENIMIENTO,
     REPARACION
 }
 
@@ -71,7 +71,7 @@ class Revision
 attributes
 fechaInicio: Integer
 fechaFin: Integer
-tipoRevision: 
+tipoRevision: TipoRevision
 end
 
 
@@ -79,7 +79,7 @@ end
 
 association estacionadoEn between
     Ciudad[0..1] role ciudadCocheEstacionado
-    Coche[*] role esta cocheEstacionadoEnCiudad
+    Coche[*] role cocheEstacionadoEnCiudad
 end
 
 association cocheHaceViaje between
@@ -89,7 +89,7 @@ end
 
 association contieneTallerNoOficial between
     Ciudad[*] role ciudadconTallerNoOficial
-    NoOficial[*] role tallerNoOficialEstaEnCiudad
+    TallerNoOficial[*] role tallerNoOficialEstaEnCiudad
 end
 
 association tallerOficialCiudad between
@@ -108,8 +108,8 @@ association tallerRevision between
 end
 
 association ciudadDestinoViaje between
-    Ciudad[1] role 
-    Viaje[*] role viajaA
+    Ciudad[1] role ciudadDestinoDelViaje
+    Viaje[*] role viajaHasta
 end
 
 association ciudadOrigenViaje between
@@ -125,40 +125,81 @@ context Viaje
 --cada ciudad debe estar al menos a 5 kilómetros de distancia de otra. 
 inv distanciaMinimaEntreCiudades:
     self.distancia >= 5
+
 --la ciudad de origen y destino de un viaje deben ser distintas
 inv ciudadOrigenYDestinoDistintas:
     self.ciudadOrigenDelViaje <> self.ciudadDestinoDelViaje
 
 
 context Coche
+--un coche no podra pasar dos revisiones a la vez
 inv revisionesDeCocheNoSePisan:
-    self.revisionDelCoche -> forAll (r1 | self.revisionDelCoche -> forAll (r2 | r1 <> r2 && r1.fechaFin < r2.fechaInicio || r1.fechaInicio > r2.fechaFin))
+    self.revisionDelCoche -> forAll (r1 | self.revisionDelCoche -> forAll (r2 | (r1 <> r2 and r1.fechaFin < r2.fechaInicio) or (r1.fechaInicio > r2.fechaFin)))
   
-  
- context cocheEnRevision
---fecha de revision del coche tiene que ser posterior a fecha de revision
-inv fechaRevisionPOSTFechaMatriculacion:
-    self.revisionDelCoche.fechaInicio > self.cocheHaciendoRevision.fechaMatriculacion
+--fecha de revision del coche tiene que ser posterior a fecha de matriculacion
+inv fechaRevisionPosteriorAMatriculacion:
+	self.revisionDelCoche -> forAll(r | r.fechaInicio >= self.fechaMatriculacion)
 
 --Si un coche está siendo sometido a revisión en un taller, el coche se debe encontrar
--- en la ciudad de ese mismo taller
-inv cocheEstaMismaCiudadTallerCuandoEnRevision:
-    if self.estado = EstadoCoche-#ENTALLER implies(
+--en la ciudad de ese mismo taller
+inv cocheEstaEnMismaCiudadQueTallerCuandoSeRevisa:
+    if self.estado = EstadoCoche::ENTALLER implies(
         if self.revisionDelCoche.tallerQueRevisa.oclIsTypeOf(TallerOficial) then
             self.ciudadCocheEstacionado = self.revisionDelCoche.tallerQueRevisa.ciudadConTallerOficial
         else
             self.ciudadCocheEstacionado = self.revisionDelCoche.tallerQueRevisa.ciudadConTallerNoOficial
         endif
     )
+	then true
+	else false
+	endif
 
 
-inv self.estado = EstadoCoche-#ENVIAJE implies self.viajeQueHaceCoche -> exists(viaje | viaje.fechaFin = null)
+--
+inv estadoViajeImplicaViaje:
+	self.estado = EstadoCoche::ENVIAJE implies self.viajeQueHaceCoche -> exists(viaje | viaje.fechaFin = null)
 
+--si un coche se encuentra en una ciudad, su próximo viaje debe empezar desde esa ciudad y 
+--no desde otra
 inv cuidadDeDestinoAnteriorCuidadDeOrigenSiguiente:
-  self.viajeQueHaceCoche -> forAll( v | self.viajeQueHaceCoche -> select(v2 | v2.fechaFin < v.fechaInicio) -> sortedBy(fechaFin) -> last().ciudadDestino = v.ciudadOrigen)) 
+  self.viajeQueHaceCoche -> forAll( v | self.viajeQueHaceCoche -> select(v2 | v2.fechaFin < v.fechaInicio) -> sortedBy(fechaFin) -> last().ciudadDestinoDelViaje = v.ciudadOrigenDelViaje)
 
---   lista = (x1,x2,x3,x4) ==> for i in range(lista)
---   i.ciudaddestino == i+1.ciudadOrigen
---   x3 -> (x1,x2) -> sort -> last() -> x2
+--
+inv cocheViajandoOEnCiudad:
+    (self.estado = EstadoCoche :: ENVIAJE) || (self.estado = EstadoCoche :: ESTACIONADO) || (self.estado = EstadoCoche :: ENTALLER)
 
- 
+--
+inv cocheEnCiudadLlegadaUltimoViaje:
+    self.viajeQueHaceCoche->exists(viaje | viaje.fechaFin <> null) implies
+    (let ultimoViaje = self.viajeQueHaceCoche->select(v | v.fechaFin <> null)->sortedBy(fechaFin)->last() in
+        ultimoViaje.ciudadDestinoDelViaje = self.ciudadCocheEstacionado)
+
+
+--2 viajes no se pueden solapar en el tiempo
+inv viajesNoSeSolapan:
+    self.viajeQueHaceCoche->forAll(v1, v2 | 
+        v1 <> v2 implies (v1.fechaInicio >= v2.fechaFin or v1.fechaFin <= v2.fechaInicio))
+--un coche está en garantia si han pasao menos de 4 años desde que se matriculó o si han pasado menos días 
+--que los indicados en la garantía del taller oficial donde el oche tuvo alguna revisión
+inv cocheEnGarantia:
+    self.garantia = true implies (
+        --
+        Clock.NOW - self.fechaMatriculacion < 400 or
+        -- Comprobar si alguna revisión en un taller oficial tiene una garantía vigente
+        self.revisionDelCoche->exists(rev |
+            rev.tallerQueRevisa.oclIsTypeOf(TallerOficial) and
+            Clock.NOW - rev.fechaFin <= rev.tallerQueRevisa.garantia
+        )
+    )
+
+--un coche no pasará revisiones hasta pasados 4 años desde su matriculacion. 
+inv noRevisionesAntesDe4Anos:
+    self.revisionDelCoche->isEmpty() or 
+    self.fechaMatriculacion + 400 <= Clock.NOW
+
+--A partir de los 4 años, no necesitará matenimiento hasta pasado un año despues de su respectiva revision de mantenimiento 
+inv noNecesitaMantenimientoAntesDeUnAno:
+    self.revisionDelCoche->forAll(rev |
+        rev.tipoRevision <> TipoRevision.MANTENIMIENTO or 
+        rev.fechaFin + 100 <= Clock.NOW
+    )
