@@ -38,9 +38,34 @@ end
 
 class Coche
 attributes
-garantia: Boolean
+enGarantia: Boolean
+derive:
+    let hoy:Integer = Clock.allInstances()->asSequence()->first().NOW in
+    if hoy - self.fechaMatriculacion >= 400 then
+        let ultimaRevisionOficial:Revision= self.revisionDelCoche->select(r | r.tallerQueRevisa.oclIsTypeOf(TallerOficial))->sortedBy(fechaFin)->last() in
+        if hoy - (ultimaRevisionOficial.fechaFin + ultimaRevisionOficial.tallerQueRevisa.oclAsType(TallerOficial).garantia) > 0 then
+            false
+        else
+            true
+        endif
+    else
+        true
+    endif
+
 necesitaMantenimiento: Boolean
+derive:
+    let hoy:Integer = Clock.allInstances()->asSequence()->first().NOW in
+    if hoy - self.fechaMatriculacion >= 400 then
+        if self.revisionDelCoche->size() = 0 then
+            true
+        else
+            hoy - self.revisionDelCoche->sortedBy(fechaInicio)->last().fechaFin > 100
+        endif
+    else 
+        false
+    endif
 fechaMatriculacion: Integer
+
 estado: EstadoCoche
 numKm: Integer
 derive:
@@ -159,10 +184,8 @@ inv estadoViajeImplicaViaje:
 inv cuidadDeDestinoAnteriorCuidadDeOrigenSiguiente:
   self.viajeQueHaceCoche -> forAll( v | self.viajeQueHaceCoche -> select(v2 | v2.fechaFin < v.fechaInicio) -> sortedBy(fechaFin) -> last().ciudadDestinoDelViaje = v.ciudadOrigenDelViaje)
 
---
 inv cocheViajandoOEnCiudad:
     (self.estado = EstadoCoche :: ENVIAJE) or (self.estado = EstadoCoche :: ESTACIONADO) or (self.estado = EstadoCoche :: ENTALLER)
-
 
 inv cocheEnCiudadLlegadaUltimoViaje:
     self.viajeQueHaceCoche->exists(viaje | viaje.fechaFin <> null) implies
@@ -175,27 +198,15 @@ inv viajesNoSeSolapan:
 
 --un coche está en garantia si han pasao menos de 4 años desde que se matriculó o si han pasado menos días 
 --que los indicados en la garantía del taller oficial donde el oche tuvo alguna revisión
-inv cocheEnGarantia:
-    --CONVERTIR TALLER EN TALLER OFICIAL QUE ES EL QUE TIENE GARANTIA
-    self.garantia = true implies (
-        --
-        (((Clock.allInstances()->asSequence()->first().NOW) - (self.fechaMatriculacion)) < 400) or
-        -- Comprobar si alguna revisión en un taller oficial tiene una garantía vigente
-        (self.revisionDelCoche->exists(rev |
-            rev.tallerQueRevisa.oclIsTypeOf(TallerOficial) and
-            Clock.allInstances()->asSequence()->first().NOW - rev.fechaFin <= rev.tallerQueRevisa.oclAsType(TallerOficial).garantia
-        ))
-    )
+-- inv cocheEnGarantia:
+--     --CONVERTIR TALLER EN TALLER OFICIAL QUE ES EL QUE TIENE GARANTIA
+--     self.enGarantia = true implies (
+--         --
+--         (((Clock.allInstances()->asSequence()->first().NOW) - (self.fechaMatriculacion)) < 400) or
+--         -- Comprobar si alguna revisión en un taller oficial tiene una garantía vigente
+--         (self.revisionDelCoche->exists(rev |
+--             rev.tallerQueRevisa.oclIsTypeOf(TallerOficial) and
+--             Clock.allInstances()->asSequence()->first().NOW - rev.fechaFin <= rev.tallerQueRevisa.oclAsType(TallerOficial).garantia
+--         ))
+--     )
 
---un coche no pasará revisiones hasta pasados 4 años desde su matriculacion. 
-inv noRevisionesAntesDe4Anos:
-    self.revisionDelCoche->isEmpty() or 
-    self.fechaMatriculacion + 400 <= Clock.allInstances()->asSequence()->first().NOW
-
---A partir de los 4 años, no necesitará matenimiento hasta pasado un año despues de su respectiva revision de mantenimiento 
---CORREGIRX
-inv noNecesitaMantenimientoAntesDeUnAno:
-    self.revisionDelCoche->forAll(rev |
-        rev.tipoRevision <> TipoRevision.MANTENIMIENTO or 
-        rev.fechaFin + 100 <= Clock.allInstances()->asSequence()->first().NOW
-    )
