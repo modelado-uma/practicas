@@ -69,7 +69,7 @@ fechaMatriculacion: Integer
 estado: EstadoCoche
 numKm: Integer
 derive:
-    self.viajeQueHaceCoche->collect(viaje | viaje.distancia)->sum()
+    self.viajeQueHaceCoche->select(v|v.fechaFin <> null)->collect(viaje | viaje.distancia)->sum()
 end
 
 class Ciudad
