@@ -118,7 +118,7 @@ kmD: Integer
             post FechaInicioEstablecida: (v.fechaInicio = Clock.allInstances()->asSequence()->any(true).NOW) 
             post ViajeAsignadoAlCoche: (self.viajeQueHaceCoche->includes(v))
 
-        avanzarViaje() --Cada tick ejecuta un avanzarViaje
+        tick() --Cada tick ejecuta un avanzarViaje
             begin
                 declare v : Viaje, dia : Integer;
                 dia:=Clock.allInstances()->asSequence()->any(true).NOW;
