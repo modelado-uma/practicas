@@ -39,6 +39,7 @@ end
 class Coche
 attributes
 garantia: Boolean
+necesitaMantenimiento: Boolean
 fechaMatriculacion: Integer
 estado: EstadoCoche
 numKm: Integer
@@ -88,12 +89,12 @@ association cocheHaceViaje between
 end
 
 association contieneTallerNoOficial between
-    Ciudad[*] role ciudadconTallerNoOficial
+    Ciudad[1] role ciudadConTallerNoOficial
     TallerNoOficial[*] role tallerNoOficialEstaEnCiudad
 end
 
 association tallerOficialCiudad between
-    Ciudad[*] role ciudadConTallerOficial
+    Ciudad[1] role ciudadConTallerOficial
     TallerOficial[1] role tallerOficialEstaEnCiudad
 end
 
@@ -134,8 +135,8 @@ inv ciudadOrigenYDestinoDistintas:
 context Coche
 --un coche no podra pasar dos revisiones a la vez
 inv revisionesDeCocheNoSePisan:
-    self.revisionDelCoche -> forAll (r1 | self.revisionDelCoche -> forAll (r2 | (r1 <> r2 and r1.fechaFin < r2.fechaInicio) or (r1.fechaInicio > r2.fechaFin)))
-  
+ 	self.revisionDelCoche -> forAll (r1 | self.revisionDelCoche -> forAll (r2 | r1 <> r2 implies (r1.fechaFin <= r2.fechaInicio or r1.fechaInicio >= r2.fechaFin)))
+ 
 --fecha de revision del coche tiene que ser posterior a fecha de matriculacion
 inv fechaRevisionPosteriorAMatriculacion:
 	self.revisionDelCoche -> forAll(r | r.fechaInicio >= self.fechaMatriculacion)
@@ -143,12 +144,12 @@ inv fechaRevisionPosteriorAMatriculacion:
 --Si un coche está siendo sometido a revisión en un taller, el coche se debe encontrar
 --en la ciudad de ese mismo taller
 inv cocheEnTallerMismaCiudad:
-    self.revisionDelCoche->exists(r | r.fechaInicio <> null) implies
-    (self.estado = #ENTALLER implies 
-        self.ciudadCocheEstacionado = self.revisionDelCoche.tallerQueRevisa.ciudadConTallerOficial)
+self.revisionDelCoche->exists(r | r.fechaInicio <> null) implies(
+	self.estado = #ENTALLER implies(
+	let ultimoTaller: Taller = self.revisionDelCoche -> sortedBy(fechaFin) -> last().tallerQueRevisa in ultimoTaller.oclIsTypeOf(TallerOficial) and ultimoTaller.oclAsType(TallerOficial).ciudadConTallerOficial = self.ciudadCocheEstacionado or ultimoTaller.oclIsTypeOf(TallerNoOficial) and ultimoTaller.oclAsType(TallerNoOficial).ciudadConTallerNoOficial = self.ciudadCocheEstacionado
+	)
+)
 	
-
-
 --
 inv estadoViajeImplicaViaje:
 	self.estado = #ENVIAJE implies self.viajeQueHaceCoche -> exists(viaje | viaje.fechaFin = null)
@@ -162,14 +163,10 @@ inv cuidadDeDestinoAnteriorCuidadDeOrigenSiguiente:
 inv cocheViajandoOEnCiudad:
     (self.estado = EstadoCoche :: ENVIAJE) or (self.estado = EstadoCoche :: ESTACIONADO) or (self.estado = EstadoCoche :: ENTALLER)
 
---
 
 inv cocheEnCiudadLlegadaUltimoViaje:
     self.viajeQueHaceCoche->exists(viaje | viaje.fechaFin <> null) implies
     (self.viajeQueHaceCoche->select(v | v.fechaFin <> null)->sortedBy(fechaFin)->last().ciudadDestinoDelViaje = self.ciudadCocheEstacionado)
-
-
-
 
 --2 viajes no se pueden solapar en el tiempo
 inv viajesNoSeSolapan:
@@ -185,10 +182,8 @@ inv cocheEnGarantia:
         (((Clock.allInstances()->asSequence()->first().NOW) - (self.fechaMatriculacion)) < 400) or
         -- Comprobar si alguna revisión en un taller oficial tiene una garantía vigente
         (self.revisionDelCoche->exists(rev |
-            
             rev.tallerQueRevisa.oclIsTypeOf(TallerOficial) and
-            
-            Clock.allInstances()->asSequence()->first().NOW - rev.fechaFin <= rev.tallerQueRevisa.garantia
+            Clock.allInstances()->asSequence()->first().NOW - rev.fechaFin <= rev.tallerQueRevisa.oclAsType(TallerOficial).garantia
         ))
     )
 

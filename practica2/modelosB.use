@@ -84,22 +84,24 @@ kmD: Integer
             pre CondicionCoche : (self.estado=EstadoCoche::ESTACIONADO) and (v.kmRecorridos=0) 
             
 
-        avanzarViaje(v : Viaje) --Cada tick ejecuta un avanzarViaje
-            -- begin
-            --     let (v : Viaje = self.viajeQueHaceCoche->select(v | not v.destinoAlcanzado)->any()) in
-            --         if (v.kmRecorridos + self.kmD >= v.distancia) then
-            --             (v.kmRecorridos:=v.distancia) and (self.estado:=EstadoCoche::ESTACIONADO) and v.fechaFin:=5;
-            --         else
-            --             v.kmRecorridos := v.kmRecorridos + self.kmD;
-            --             end;
-            --         end;
-            --     end
-            -- end
-            -- pre viajeYaComenzado: (self.estado = EstadoCoche::ENVIAJE)
+        avanzarViaje() --Cada tick ejecuta un avanzarViaje
+            begin
+                declare v : Viaje;
+                v:=self.viajeQueHaceCoche->select(v | not v.destinoAlcanzado)->any(true);
+                    if ((v.kmRecorridos + self.kmD) >= v.distancia) then 
+                        v.kmRecorridos:=v.distancia;
+                        self.estado:=EstadoCoche::ESTACIONADO;
+                        v.fechaFin:=5;
+                    else
+                        v.kmRecorridos:=v.kmRecorridos + self.kmD
+                    end
+            end
+            pre YaComenzado: (self.estado = EstadoCoche::ENVIAJE) 
 --ARREGLAR
 end
         
         
+-- if ((v.kmRecorridos + self.kmD) >= v.distancia) then v.kmRecorridos:=20 else v.kmRecorridos:=40 end
     
 
 
