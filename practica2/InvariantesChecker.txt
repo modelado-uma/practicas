@@ -1,0 +1,15 @@
+Invariantes que SI funcionan (10/10)
+-> estadoViajeImplicaViaje
+-> viajesNoSeSolapan
+-> distanciaMinimaEntreCiudades
+-> ciudadOrigenDestionDistintas
+-> cocheEnCiudadLlegadaUltimoViaje
+-> cocheViajandoOEnCiudad
+-> ciudadDeDestinoAnteriorCuidadDeOrigenSiguiente
+-> cocheEnTallerMismaCiudad
+-> revisionesDeCocheNoSePisan
+-> fechaRevisionPosteriorAMatriculacion
+
+Invariantes con soil para su respectiva prueba (0/10)
+
+Invariantes que NO funcionan (0/10)

@@ -1,0 +1,51 @@
+!new Ciudad('Malaga')
+!new Ciudad('Sevilla')
+!new Ciudad('Granada')
+!new Coche
+!Coche1.fechaMatriculacion := 0
+!Coche1.estado := EstadoCoche::ESTACIONADO
+!Coche1.kmD := 27
+!new Viaje
+!Viaje1.fechaInicio := 5
+!Viaje1.distancia := 210
+!new Viaje
+!Viaje2.distancia := 250
+!insert (Malaga,Viaje1) into ciudadOrigenViaje
+!insert (Sevilla,Viaje1) into ciudadDestinoViaje
+!insert (Sevilla,Viaje2) into ciudadOrigenViaje
+!insert (Granada,Viaje2) into ciudadDestinoViaje
+!new Clock
+
+--Instante 0
+
+!insert (Clock1,Coche1) into Time
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Coche1.comenzarViaje(Viaje1)
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+
+--Instante 1
+
+!Coche1.comenzarViaje(Viaje2)
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+!Clock1.tick()
+
+--Instante 2
