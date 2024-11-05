@@ -11,6 +11,6 @@ Invariantes que SI funcionan (10/10)
 -> fechaRevisionPosteriorAMatriculacion
 
 Invariantes con soil para su respectiva prueba (1/10)
--> distanciaMinimaEntreCiudades
+-> distanciaMinimaEntreCiudades (Ya actualizado en PDF)
 
 Invariantes que NO funcionan (0/10)
