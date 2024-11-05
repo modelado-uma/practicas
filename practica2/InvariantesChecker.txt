@@ -10,10 +10,11 @@ Invariantes que SI funcionan (10/10)
 -> revisionesDeCocheNoSePisan
 -> fechaRevisionPosteriorAMatriculacion
 
-Invariantes con soil para su respectiva prueba (4/10)
+Invariantes con soil para su respectiva prueba (5/10)
 -> distanciaMinimaEntreCiudades (Ya actualizado en PDF)
 -> ciudadOrigenDestinoDistintas (Ya actualizado en PDF)
 -> revisionesDeCocheNoSePisan (Ya actualizado en PDF)
 -> fechaRevisionPosteriorAMatriculacion (Ya actualizado en PDF)
+-> cocheEnTallerMismaCiudad (Ya actualizado en PDF)
 
 Invariantes que NO funcionan (0/10)
