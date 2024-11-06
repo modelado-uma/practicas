@@ -5,8 +5,6 @@
 !new Viaje
 !new Viaje
 !new Clock
-!destroy Clock1
-!destroy Coche1
 !new Coche
 !Coche2.fechaMatriculacion := 0
 !Coche2.estado := EstadoCoche::ESTACIONADO

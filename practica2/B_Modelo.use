@@ -257,6 +257,7 @@ inv estadoViajeImplicaViaje:
 
 --si un coche se encuentra en una ciudad, su próximo viaje debe empezar desde esa ciudad y 
 --no desde otra
+
 inv cuidadDeDestinoAnteriorCuidadDeOrigenSiguiente:
   self.viajeQueHaceCoche -> forAll( v | 
     let viajePrevio = self.viajeQueHaceCoche->select(v2 | v2.fechaFin <= v.fechaInicio)->sortedBy(fechaFin)->last() in
