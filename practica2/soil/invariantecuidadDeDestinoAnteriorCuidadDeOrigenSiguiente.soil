@@ -1,0 +1,25 @@
+!new Ciudad('MALAGA')
+!new Ciudad('MADRID')
+!new Ciudad('GRANADA')
+!new Coche('SEAT')
+!SEAT.estado := EstadoCoche::ESTACIONADO
+
+
+!new Viaje('viaje1')
+!viaje1.fechaInicio := 1
+!viaje1.fechaFin := 2
+!viaje1.distancia := 8
+!insert(MALAGA,viaje1) into ciudadOrigenViaje
+!insert(MADRID,viaje1) into ciudadDestinoViaje
+!insert (SEAT, viaje1) into cocheHaceViaje
+
+!new Viaje('viaje2')
+!viaje2.fechaInicio := 3
+!viaje2.fechaFin := 4
+!viaje2.distancia := 7
+!insert(MADRID,viaje2) into ciudadOrigenViaje
+!insert(GRANADA,viaje2) into ciudadDestinoViaje
+!insert (SEAT, viaje2) into cocheHaceViaje
+!insert (GRANADA, SEAT) into estacionadoEn
+
+

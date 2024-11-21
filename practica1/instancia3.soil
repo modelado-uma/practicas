@@ -1,0 +1,51 @@
+reset
+!new Piloto('piloto1')
+!new Piloto('piloto2')
+!new Vuelo('vuelo1')
+!new Vuelo('vuelo2')
+!new Vuelo('vuelo3')
+!new Aerolinea('aerolinea1')
+
+!piloto1.nombre := 'Carlos'
+!piloto1.edad := 40
+!piloto1.kmVolados := 1500000
+!piloto1.pro := true  -- Este piloto debe cumplir con la condición de profesional
+
+!piloto2.nombre := 'Ana'
+!piloto2.edad := 35
+!piloto2.kmVolados := 800000
+!piloto2.pro := false  -- Este piloto no debe cumplir la condición de profesional
+
+!vuelo1.id := 1
+!vuelo1.num_km := 1000
+
+!vuelo2.id := 2
+!vuelo2.num_km := 2000
+
+!vuelo3.id := 3
+!vuelo3.num_km := 3000
+
+!for i in 1 to 1000 do
+  !new Vuelo('vuelo_principal_' + i)
+  !insert(piloto1, 'vuelo_principal_' + i) into pilotadoPrincipal
+end
+
+!for i in 1 to 2000 do
+  !new Vuelo('vuelo_secundario_' + i)
+  !insert(piloto1, 'vuelo_secundario_' + i) into pilotadoSecundario
+end
+
+!for i in 1 to 500 do
+  !new Vuelo('vuelo_principal_ana_' + i)
+  !insert(piloto2, 'vuelo_principal_ana_' + i) into pilotadoPrincipal
+end
+
+!for i in 1 to 1000 do
+  !new Vuelo('vuelo_secundario_ana_' + i)
+  !insert(piloto2, 'vuelo_secundario_ana_' + i) into pilotadoSecundario
+end
+
+-- Asociar pilotos con la aerolínea
+!aerolinea1.nombre := 'Iberia'
+!insert(piloto1, aerolinea1) into PilotoAerolinea
+!insert(piloto2, aerolinea1) into PilotoAerolinea

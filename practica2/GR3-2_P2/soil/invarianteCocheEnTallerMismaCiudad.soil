@@ -1,0 +1,14 @@
+!new Coche('TOYOTA')
+!new Ciudad('MALAGA')
+!new Ciudad('MADRID')
+!new Revision('revision1')
+!new TallerOficial('Eurotaller')
+!TOYOTA.estado := EstadoCoche::ENTALLER
+!TOYOTA.fechaMatriculacion := 1
+!revision1.fechaInicio := 2
+!revision1.fechaFin := 4
+
+!insert (MADRID,TOYOTA) into estacionadoEn
+!insert (TOYOTA,revision1) into cocheEnRevision
+!insert (Eurotaller,revision1) into tallerRevision
+!insert (MALAGA,Eurotaller) into tallerOficialCiudad

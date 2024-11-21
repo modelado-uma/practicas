@@ -1,0 +1,23 @@
+reset
+-- Comprobando la invariante de AvionEnDesguace (vuelosCompletados >= 1000 -> Desguace)
+!new Avion('avion1')
+!new Avion('avion2')
+!new Avion('avion3')
+!new Avion('avion4')
+
+!new Aerolinea('Air_Europa')
+!Air_Europa.nombre := 'Air_Europa'
+
+!new Hangar('Hangar')
+
+!new Desguace('Desguace')
+
+!insert(avion1,Air_Europa) into Contrato
+!insert(avion2, Air_Europa) into Contrato
+!insert(avion3, Air_Europa) into Contrato
+!insert(avion4, Air_Europa) into Contrato
+
+!insert(avion1,Hangar)
+!insert(avion2,Hangar)
+!insert(avion3,Desguace)
+!insert(avion4,Desguace)

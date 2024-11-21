@@ -1,0 +1,16 @@
+!new Ciudad ('MALAGA')
+!new Ciudad ('GRANADA')
+
+!new Coche ('HYUNDAI')
+!HYUNDAI.estado := EstadoCoche::ENVIAJE
+!HYUNDAI.fechaMatriculacion := 600
+
+!new Viaje ('viaje1')
+!viaje1.fechaInicio := 900
+!viaje1.fechaFin := null
+!viaje1.distancia := 50
+
+!insert (MALAGA, HYUNDAI) into estacionadoEn
+!insert (HYUNDAI, viaje1) into cocheHaceViaje
+!insert (MALAGA, viaje1) into ciudadOrigenViaje
+!insert (GRANADA, viaje1) into ciudadDestinoViaje

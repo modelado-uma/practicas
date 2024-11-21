@@ -1,0 +1,198 @@
+model Practica2
+
+enum EstadoCoche {
+    ESTACIONADO,
+    ENVIAJE,
+    ENTALLER
+}
+
+enum TipoRevision {
+    MANTENIMIENTO,
+    REPARACION
+}
+
+
+class Clock 
+attributes
+    NOW : Integer init = 0 -- POSIX representation starting at 0
+--         resolution: Integer init = 1 
+--     operations
+--         tick() 
+--             begin
+--                 self.NOW := self.NOW + self.resolution;
+--                 for o in self.ao do 
+--                     o.tick()
+--             end;
+--         end
+--         post TimePasses: self.NOW = self.NOW@pre + self.resolution
+--     run (n: Integer)
+--         begin
+--             for i in Sequence{1..n} do
+--                 self.tick()
+--             end 
+end
+--   constraints
+--     inv PositiveResolution: self.resolution > 0
+
+
+
+class Coche
+attributes
+enGarantia: Boolean
+derive:
+    let hoy:Integer = Clock.allInstances()->asSequence()->first().NOW in
+    if hoy - self.fechaMatriculacion >= 400 then
+        let ultimaRevisionOficial:Revision= self.revisionDelCoche->select(r | r.tallerQueRevisa.oclIsTypeOf(TallerOficial))->sortedBy(fechaFin)->last() in
+        if hoy - (ultimaRevisionOficial.fechaFin + ultimaRevisionOficial.tallerQueRevisa.oclAsType(TallerOficial).garantia) > 0 then
+            false
+        else
+            true
+        endif
+    else
+        true
+    endif
+
+necesitaMantenimiento: Boolean
+derive:
+    let hoy:Integer = Clock.allInstances()->asSequence()->first().NOW in
+    if hoy - self.fechaMatriculacion >= 400 then
+        if self.revisionDelCoche->size() = 0 then
+            true
+        else
+            hoy - self.revisionDelCoche->sortedBy(fechaInicio)->last().fechaFin > 100
+        endif
+    else 
+        false
+    endif
+fechaMatriculacion: Integer
+
+estado: EstadoCoche
+numKm: Integer
+derive:
+    self.viajeQueHaceCoche->select(v|v.fechaFin <> null)->collect(viaje | viaje.distancia)->sum()
+end
+
+class Ciudad
+end
+
+class Viaje
+attributes
+fechaInicio: Integer
+fechaFin: Integer
+distancia: Integer
+end
+
+abstract class Taller
+end
+
+class TallerOficial < Taller
+attributes
+garantia: Integer
+end
+
+class TallerNoOficial < Taller
+end
+
+class Revision
+attributes
+fechaInicio: Integer
+fechaFin: Integer
+tipoRevision: TipoRevision
+end
+
+
+----------Asociaciones---------- 
+
+association estacionadoEn between
+    Ciudad[0..1] role ciudadCocheEstacionado
+    Coche[*] role cocheEstacionadoEnCiudad
+end
+
+association cocheHaceViaje between
+    Coche[1] role cocheEnElViaje
+    Viaje[*] role viajeQueHaceCoche
+end
+
+association contieneTallerNoOficial between
+    Ciudad[1] role ciudadConTallerNoOficial
+    TallerNoOficial[*] role tallerNoOficialEstaEnCiudad
+end
+
+association tallerOficialCiudad between
+    Ciudad[1] role ciudadConTallerOficial
+    TallerOficial[0..1] role tallerOficialEstaEnCiudad
+end
+
+association cocheEnRevision between
+    Coche[1] role cocheHaciendoRevision
+    Revision[*] role revisionDelCoche
+end
+
+association tallerRevision between
+    Taller[1] role tallerQueRevisa
+    Revision[*] role RevisionRealizadaPorTaller
+end
+
+association ciudadDestinoViaje between
+    Ciudad[1] role ciudadDestinoDelViaje
+    Viaje[*] role viajaA
+end
+
+association ciudadOrigenViaje between
+    Ciudad[1] role ciudadOrigenDelViaje
+    Viaje[*] role viajaDesde
+end
+
+--Invariantes
+
+constraints
+
+context Viaje 
+--cada ciudad debe estar al menos a 5 kilómetros de distancia de otra. 
+inv distanciaMinimaEntreCiudades:
+    self.distancia >= 5
+
+--la ciudad de origen y destino de un viaje deben ser distintas
+inv ciudadOrigenYDestinoDistintas:
+    self.ciudadOrigenDelViaje <> self.ciudadDestinoDelViaje
+
+
+context Coche
+--un coche no podra pasar dos revisiones a la vez
+inv revisionesDeCocheNoSePisan:
+ 	self.revisionDelCoche -> forAll (r1 | self.revisionDelCoche -> forAll (r2 | r1 <> r2 implies (r1.fechaFin <= r2.fechaInicio or r1.fechaInicio >= r2.fechaFin)))
+ 
+--fecha de revision del coche tiene que ser posterior a fecha de matriculacion
+inv fechaRevisionPosteriorAMatriculacion:
+	self.revisionDelCoche -> forAll(r | r.fechaInicio >= self.fechaMatriculacion)
+
+--Si un coche está siendo sometido a revisión en un taller, el coche se debe encontrar
+--en la ciudad de ese mismo taller
+inv cocheEnTallerMismaCiudad:
+self.revisionDelCoche->exists(r | r.fechaInicio <> null) implies(
+	self.estado = #ENTALLER implies(
+	let ultimoTaller: Taller = self.revisionDelCoche -> sortedBy(fechaFin) -> last().tallerQueRevisa in ultimoTaller.oclIsTypeOf(TallerOficial) and ultimoTaller.oclAsType(TallerOficial).ciudadConTallerOficial = self.ciudadCocheEstacionado or ultimoTaller.oclIsTypeOf(TallerNoOficial) and ultimoTaller.oclAsType(TallerNoOficial).ciudadConTallerNoOficial = self.ciudadCocheEstacionado
+	)
+)
+
+inv estadoViajeImplicaViaje:
+	self.estado = #ENVIAJE implies self.viajeQueHaceCoche -> exists(viaje | viaje.fechaFin = null)
+
+--si un coche se encuentra en una ciudad, su próximo viaje debe empezar desde esa ciudad y 
+--no desde otra
+inv cuidadDeDestinoAnteriorCuidadDeOrigenSiguiente:
+  self.viajeQueHaceCoche -> forAll( v | 
+    let viajePrevio = self.viajeQueHaceCoche->select(v2 | v2.fechaFin <= v.fechaInicio)->sortedBy(fechaFin)->last() in
+    viajePrevio.oclIsUndefined() or viajePrevio.ciudadDestinoDelViaje = v.ciudadOrigenDelViaje)
+
+inv cocheViajandoOEnCiudad:
+    (self.estado = EstadoCoche :: ENVIAJE) or (self.estado = EstadoCoche :: ESTACIONADO) or (self.estado = EstadoCoche :: ENTALLER)
+
+inv cocheEnCiudadLlegadaUltimoViaje:
+    self.viajeQueHaceCoche->exists(viaje | viaje.fechaFin <> null) implies
+    (self.viajeQueHaceCoche->select(v | v.fechaFin <> null)->sortedBy(fechaFin)->last().ciudadDestinoDelViaje = self.ciudadCocheEstacionado)
+
+--2 viajes no se pueden solapar en el tiempo
+inv viajesNoSeSolapan:
+    self.viajeQueHaceCoche->forAll(v1, v2 | 
+        v1 <> v2 and v1.fechaFin <>null and v2.fechaFin<>null implies (v1.fechaInicio >= v2.fechaFin or v1.fechaFin <= v2.fechaInicio))
