@@ -11,6 +11,7 @@ class Avion
 attributes
 vuelosCompletados : Integer
 kilometrosRecorridos : Integer
+estado : Enum
 
 class aeropuerto
 attributes 
@@ -30,6 +31,7 @@ capacidadMaxima : Integer
 capacidadEnUso : Integer
 
 ----------Asociaciones----------
+
 association pilotoVuelaAvion between
   Piloto[0..1] role piloto
   Avion[0..1] role avion 
@@ -53,6 +55,11 @@ context Avion
 
 inv avionEnDesguace:
     self.vuelosCompletados >= 1000
+
+-- El estado del avion solo puede ser o hangar o desguace o volando
+
+inv estadoDelAvion
+    self.estado
 
 context Hangar
 
