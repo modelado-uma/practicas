@@ -8,5 +8,10 @@ public class Donante extends Socio{
 		super(registro);
 		// TODO Auto-generated constructor stub
 	}
-
+	public void donar(Integer c){
+		Date fecha = new Date();
+		Donacion donacion = new Donacion(c, fecha);
+		donacion.registrarDonacion(c);
+		System.out.println("El donante ha donado " + c + " euros");
+	}
 }
