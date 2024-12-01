@@ -22,6 +22,13 @@ public class Donante extends Socio{
 		ref.setLiquidez(liquidez + c);
 		System.out.println("El donante ha donado " + c + " euros");
 	}
+	
+	
+	
+	public List<Donacion> getDonaciones() {
+		return donaciones;
+	}
+
 	@Override
 	public String toString() {
 		return "Donante [id=" + getId() + "]";

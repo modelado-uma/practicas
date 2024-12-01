@@ -27,4 +27,9 @@ public class Donacion {
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
+
+	@Override
+	public String toString() {
+		return "Donacion [cantidad=" + cantidad + ", fecha=" + fecha + "]";
+	}
 }
