@@ -28,7 +28,7 @@ public class main {
         socio.registrar(leon);
         socio.registrar(perro);
 
-        socio2.registrar(pantera);
+        socio2.registrar(pantera); //No se debe registrar porque no es Voluntario
 
         System.out.println("Animales registrados:\n" + patitasContentas.getAnimalesRegistrados());
         System.out.println("\nAnimales Refugiados:\n" + patitasContentas.getAnimalesRefugiados());
@@ -43,8 +43,10 @@ public class main {
 
         //PROBAMOS donar
         socio2.donar(50);
+        socio.donar(150); //Al no ser donante no puede donar
         socio2.getDonaciones();
-        System.out.println("Las donaciones realizadas por " + socio2 + "son:\n " + socio2.getDonaciones());
+        System.out.println("Las donaciones realizadas por " + socio2 + " son:\n " + socio2.getDonaciones());
+        System.out.println("La liquidez del refugio ahora es de: " + patitasContentas.getLiquidez() + "€");
 
 
 

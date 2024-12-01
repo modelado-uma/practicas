@@ -13,8 +13,8 @@ public class Voluntario extends Socio{
 		tramites = new ArrayList<Adopcion>();
 	}
 	
-	public void registrar(Refugio refugio, Animal animal) {
-		refugio.registrar(animal);
+	public void registrar(Animal animal) {
+		super.getRefugio().registrar(animal);
 		System.out.println("Animal registrado en el refugio por el voluntario");
 	}
 	

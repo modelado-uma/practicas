@@ -1,7 +1,5 @@
 package ejercicio2;
 
-import java.util.Date;
-
 public class Adoptante implements IAdoptante{
 
 	private Socio socio;

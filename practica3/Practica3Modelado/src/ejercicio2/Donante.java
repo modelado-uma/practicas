@@ -1,10 +1,6 @@
 package ejercicio2;
 
-import ejercicio2.IDonante;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class Donante implements IDonante {
 	private Socio socio;
@@ -12,6 +8,7 @@ public class Donante implements IDonante {
 
 	public Donante(Socio s){
 		socio = s;
+		donaciones = new ArrayList<Donacion>();
 	}
 
 	public void donar(double c){
@@ -26,7 +23,7 @@ public class Donante implements IDonante {
 
 	@Override
 	public List<Donacion> getDonaciones() {
-		return donaciones;
+		return this.donaciones;
 	}
 
 	@Override

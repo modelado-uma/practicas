@@ -11,6 +11,7 @@ public class Adopcion {
 		
 		this.fecha = fecha;
 		this.adoptantes = adoptantes;
+		this.animales = new ArrayList<Animal>();
 		this.animales.add(animal);
 		this.voluntario = voluntario;
 	}
