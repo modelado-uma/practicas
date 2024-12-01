@@ -8,8 +8,10 @@ enum EstadoAnimal {
 public class Animal {
 	private final Date nacimiento;
 	private EstadoAnimal estado;
+	private int id;
 	
-	public Animal(Date nacimiento) {
+	public Animal(int id,Date nacimiento) {
+		this.id = id;
 		this.nacimiento = nacimiento;
 		this.estado = EstadoAnimal.disponible;
 	}
@@ -29,5 +31,27 @@ public class Animal {
 			throw new IllegalArgumentException("El estado no puede ser nulo");
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof Animal))
+			return false;
+		Animal other = (Animal) obj;
+		return id == other.id;
+	}
+
+	@Override
+	public String toString() {
+		return "Animal [id=" + id + "]";
+	}
+	
+	
 	
 }

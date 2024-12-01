@@ -8,10 +8,11 @@ public class Donante extends Socio{
 
 	private List<Donacion> donaciones;
 
-	public Donante(Date registro, Refugio refugio) {
-		super(registro, refugio);
+	public Donante(Date registro, Refugio refugio,int id) {
+		super(registro, refugio,id);
 		donaciones = new ArrayList<Donacion>();
 	}
+	
 	public void donar(Integer c){
 		Date fecha = new Date();
 		Donacion donacion = new Donacion(c, fecha);
@@ -20,5 +21,9 @@ public class Donante extends Socio{
 		Double liquidez = ref.getLiquidez();
 		ref.setLiquidez(liquidez + c);
 		System.out.println("El donante ha donado " + c + " euros");
+	}
+	@Override
+	public String toString() {
+		return "Donante [id=" + getId() + "]";
 	}
 }

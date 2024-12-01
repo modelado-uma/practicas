@@ -1,0 +1,21 @@
+package ejercicio1;
+import java.util.*;
+
+public class Socio {
+	private final Date registro;
+	private final Refugio refugio;
+	
+	public Socio (Date registro, Refugio refugio) {
+		this.registro = registro;
+		this.refugio = refugio;
+		
+		
+	}
+	
+	public Date getRegistro() {
+		return this.registro;
+	}
+	public Refugio getRefugio() {
+		return this.refugio;
+	}
+}
