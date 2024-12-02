@@ -14,9 +14,9 @@ public class Prueba1 {
 		
 		//Voluntario registra animales
 		Voluntario voluntario = new Voluntario(new Date(),refugio,10);
-		voluntario.registrar(refugio, perro);
-		voluntario.registrar(refugio, leon);
-		voluntario.registrar(refugio, pantera);
+		voluntario.registrar(perro);
+		voluntario.registrar(leon);
+		voluntario.registrar(pantera);
 		
 		System.out.println("\nLos animales refugiados son:\n");
 		System.out.println(refugio.getAnimalesRefugiados());

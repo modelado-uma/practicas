@@ -1,4 +1,4 @@
-package ejercicio1;
+package ejercicio2;
 import java.util.*;
 
 public class Adopcion {
@@ -39,8 +39,7 @@ public class Adopcion {
 	public Voluntario getVoluntario() {
 		return voluntario;
 	}
-    
-    
+
     
     
     

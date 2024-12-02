@@ -1,27 +1,28 @@
-package ejercicio1;
+package ejercicio2;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Voluntario extends Socio{
+public class Voluntario implements IVoluntario{
 
 	private List<Adopcion> tramites;
-	
-	public Voluntario(Date registro,Refugio ref,int id) {
-		super(registro,ref,id);
-		tramites = new ArrayList<Adopcion>();
+	Socio socio;
+
+	public Voluntario(Socio s) {
+		socio = s;
+		this.tramites = new ArrayList<Adopcion>();
 	}
-	
+
 	public void registrar(Animal animal) {
-		super.getRefugio().registrar(animal);
+		socio.getRefugio().registrar(animal);
 		System.out.println("Animal registrado en el refugio por el voluntario");
 	}
-	
-	protected void tramitarAdopcion(Animal animal, Adoptante adoptante) {
+
+	public void tramitarAdopcion(Animal animal, Adoptante adoptante) {
 		if(animal.getEstado() == EstadoAnimal.disponible) {
 			animal.cambiarEstado(EstadoAnimal.adoptado);
-			super.getRefugio().removeAnimalAdoptado(animal);
+			socio.getRefugio().removeAnimalAdoptado(animal);
 			Adopcion nuevaAdopcion = new Adopcion(new Date(),adoptante,animal,this);
 			
 			addTramites(nuevaAdopcion);
@@ -49,6 +50,6 @@ public class Voluntario extends Socio{
 
 	@Override
 	public String toString() {
-		return "Voluntario [id()=" + getId() + "]";
+		return "Voluntario [id()=" + socio.getId() + "]";
 	}
 }
