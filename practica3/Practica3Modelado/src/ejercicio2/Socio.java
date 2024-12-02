@@ -26,6 +26,18 @@ public class Socio{
 	public void asignarDonante(IDonante donante){
 		this.rolDonante = donante;
 	}
+	
+	public void quitarVoluntario() {
+		this.rolVoluntario = null;
+	}
+	
+	public void quitarAdoptante() {
+		this.rolAdoptante = null;
+	}
+	
+	public void quitarDonante() {
+		this.rolDonante = null;
+	}
 
 	public boolean isAdoptante(){
 		return rolAdoptante != null;
